@@ -75,70 +75,65 @@
 - **YOLOv8 성능**: 사전 학습된 모델 사용 시 특정 객체 탐지 정확도가 낮을 수 있음.
 
 ## 설치 및 실행 가이드
+# 웹캠 기반 부정행위 탐지 시스템 설치 및 실행 가이드
 
-### 1. 필수 라이브러리 설치
-아래 명령어를 사용하여 필요한 라이브러리를 설치합니다:
+## 1. GazeTracking 설치
+
+GitHub에서 GazeTracking 저장소를 클론합니다:
+
+```bash
+git clone https://github.com/antoinelame/GazeTracking.git
+```
+
+## 2. 필요한 라이브러리 설치
 
 ```bash
 # 기본 라이브러리
-pip install opencv-python numpy
+pip install opencv-python numpy dlib scipy
 
-# 시선 추적 라이브러리
-pip install gaze-tracking
-
-# YOLO 객체 탐지
+# YOLO 객체 탐지 (선택사항)
 pip install ultralytics
-
-# Dlib 설치 (얼굴 랜드마크 감지용)
-pip install dlib
 ```
 
-### 2. 필요한 모델 파일 다운로드
-- **얼굴 랜드마크 모델**:
-  - Dlib의 얼굴 랜드마크 예측 모델 다운로드: [shape_predictor_68_face_landmarks.dat](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)
-  - 압축을 풀고 코드와 같은 디렉토리에 저장.
-- **YOLO 모델**:
-  - 첫 실행 시 `yolov8n.pt`가 자동으로 다운로드됩니다. 인터넷 연결이 필요합니다.
+## 3. 얼굴 랜드마크 모델 확인
 
-### 3. 시스템 요구 사항
-- Python 3.6 이상
-- 웹캠이 장착된 컴퓨터
-- 적절한 조명 환경 (얼굴이 잘 보이는 조건)
-- YOLOv8과 Dlib을 원활하게 실행할 수 있는 적절한 컴퓨팅 성능
+GazeTracking 저장소에는 이미 얼굴 랜드마크 모델이 포함되어 있어야 합니다. 경로를 확인해보세요:
 
-### 4. 실행 방법
-1. 코드를 `cheating_detection_advanced.py` 파일로 저장합니다.
-2. 터미널 또는 명령 프롬프트에서 다음 명령어를 실행합니다:
+```
+GazeTracking/trained_models/shape_predictor_68_face_landmarks.dat
+```
+
+파일이 없는 경우, [dlib 랜드마크 모델](http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2)을 다운로드하고 압축을 풀어 위 경로에 넣어주세요.
+
+## 4. 코드 실행
+
+제공된 코드를 `cheating_detector.py`와 같은 파일명으로 저장하고 실행합니다:
 
 ```bash
-python cheating_detection_advanced.py
+python cheating_detector.py
 ```
 
-3. 웹캠이 활성화되고 부정행위 탐지 시스템이 시작됩니다.
-4. 종료하려면 화면이 활성화된 상태에서 'q' 키를 누르세요.
+## 5. 선택적 기능
 
-### 5. 주요 기능
-- **시선 추적**: 응시자의 시선이 화면 중앙에서 5초 이상 벗어나면 경고.
-- **객체 탐지**: 휴대폰, 책 등 부정행위 관련 객체 감지.
-- **머리 방향 추정**: 머리가 화면을 향하고 있는지 확인.
-- **관심 영역(ROI) 모니터링**: 시선과 머리 방향이 정의된 화면 영역 내에 있는지 확인.
+- **YOLOv8**: 객체 탐지를 위해 필요합니다. 첫 실행 시 자동으로 모델이 다운로드됩니다.
+- **머리 방향 추정**: 얼굴 랜드마크 모델이 정상적으로 로드되면 사용 가능합니다.
 
-### 6. 문제 해결
-- **웹캠 인식 오류**: 장치 관리자에서 웹캠이 정상 작동하는지 확인하세요.
-- **라이브러리 설치 오류**: Python 버전과 호환되는 라이브러리 버전을 확인하세요.
-- **Dlib 설치 문제**: Windows의 경우 Visual Studio C++ Build Tools가 필요할 수 있습니다 ([PyImageSearch](https://www.pyimagesearch.com/2018/01/22/install-dlib-easy-complete-guide/)).
-- **성능 저하**: 저사양 장치에서는 YOLOv8n 대신 더 가벼운 모델을 사용하거나, 프레임 처리 간격을 늘리는 것을 고려하세요.
+코드는 필요한 구성 요소가 없어도 작동하도록 설계되었으며, 사용할 수 없는 기능은 자동으로 비활성화됩니다.
 
-### 7. 코드 사용자 정의
-- **부정행위 임계값 조정**: `threshold` 값을 변경하여 시선 탐지 민감도 조정 (기본값 150 = 5초).
-- **ROI 영역 조정**: `roi_x`, `roi_y`, `roi_w`, `roi_h` 값을 조정하여 관심 영역 크기 변경.
-- **객체 탐지 추가**: YOLOv8의 COCO 데이터셋 클래스 ID를 추가하여 다른 객체 탐지 가능 (예: 키보드, 노트북).
+## 6. 문제 해결
 
-## Key Citations
-- [GazeTracking Library for Eye Tracking](https://github.com/antoinelame/GazeTracking)
-- [Ultralytics YOLO Documentation for Object Detection](https://docs.ultralytics.com/)
-- [Dlib Library for Machine Learning and Face Detection](http://dlib.net/)
-- [LearnOpenCV Head Pose Estimation Tutorial](https://learnopencv.com/head-pose-estimation-using-opencv-and-dlib/)
-- [PyImageSearch Dlib Installation Guide](https://www.pyimagesearch.com/2018/01/22/install-dlib-easy-complete-guide/)
-- [Detection of Malpractice in E-exams by Head Pose and Gaze Estimation](https://www.semanticscholar.org/paper/Detection-of-Malpractice-in-E-exams-by-Head-Pose-Indi-Pritham/552358015d28db0178372b1a51e956f99b19e657)
-- [GitHub Test-Cheating-Detection Project](https://github.com/akshaysatyam2/Test-Cheating-Detection)
+### GazeTracking 관련 오류
+- 코드 시작 부분의 `gaze_tracking_path` 변수를 GazeTracking 저장소의 정확한 경로로 수정하세요.
+- GazeTracking 저장소의 `__init__.py` 파일이 존재하는지 확인하세요.
+
+### 얼굴 랜드마크 모델 관련 오류
+- 랜드마크 모델 파일의 경로가 정확한지 확인하세요.
+- 필요한 경우 코드에서 `landmark_path` 변수를 직접 수정할 수 있습니다.
+
+### 웹캠 접근 오류
+- 다른 프로그램이 웹캠을 사용 중인지 확인하세요.
+- 웹캠 장치 번호를 변경해보세요 (기본값은 0).
+
+### YOLO 관련 오류
+- YOLO 기능이 필요하지 않다면, 코드가 자동으로 이 기능을 비활성화합니다.
+- 인터넷 연결을 확인하세요 (첫 실행 시 모델 다운로드 필요).
